@@ -13,12 +13,12 @@ internal class IcmpRequest
     public int Checksum { get; private set; }
     public int MessageSize { get; private set; }
     public int ReceiveTimeout { get; private set; }
+    public bool DontFragment { get; private set; }
     public IpAddressFamily AddressFamily { get; private set; }
     public IPEndPoint IpEndPointFrom { get; private set; } = null!;
-
     public IPEndPoint IpEndPointTo { get; private set; } = null!;
 
-    internal async Task Init(int ttl, string endPoint, int receiveTimeout, CancellationToken cancellationToken)
+    internal async Task Init(int ttl, string endPoint, int receiveTimeout, bool dontFragment, CancellationToken cancellationToken)
     {
         IpEndPointTo = await GetEndpointFromString(endPoint, cancellationToken);
         IpEndPointFrom = new IPEndPoint(await GetFromHostOrIp(AddressFamily, cancellationToken), 0);
@@ -32,6 +32,7 @@ internal class IcmpRequest
         AddressFamily = GetIpAddressFamily(IpEndPointTo.AddressFamily);
         Type = CalculateType(AddressFamily);
 
+        DontFragment = dontFragment;
         Ttl = ttl;
         ReceiveTimeout = receiveTimeout;
         Code = 0x00;

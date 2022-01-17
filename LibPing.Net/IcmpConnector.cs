@@ -23,7 +23,7 @@ public static class IcmpConnector
         {
             case IpAddressFamily.IpV4:
                 host.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.IpTimeToLive, icmpRequest.Ttl);
-                host.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.DontFragment, true);
+                host.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.DontFragment, icmpRequest.DontFragment);
                 break;
             case IpAddressFamily.IpV6:
                 host.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, icmpRequest.Ttl);
