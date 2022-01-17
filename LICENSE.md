@@ -2,16 +2,16 @@
 ## Full name
 Apache License 2.0
 
-##Short identifier
+## Short identifier
 Apache-2.0
 
-##Other web pages for this license
+## Other web pages for this license
 https://www.apache.org/licenses/LICENSE-2.0
 https://opensource.org/licenses/Apache-2.0
-##Notes
+## Notes
 This license was released January 2004
 
-##Text
+## Text
 Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/
