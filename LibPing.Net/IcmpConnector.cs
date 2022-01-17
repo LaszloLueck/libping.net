@@ -27,6 +27,7 @@ public static class IcmpConnector
                 break;
             case IpAddressFamily.IpV6:
                 host.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.HopLimit, icmpRequest.Ttl);
+                host.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IpTimeToLive, icmpRequest.Ttl);
                 break;
             default:
                 throw new InvalidEnumArgumentException();
