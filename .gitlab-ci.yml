@@ -34,6 +34,6 @@ securityanalysis:
 deploy:
   stage: deploy
   script:
-    - dotnet install nuget
+    - dotnet tool install nuget
     - nuget pack $SOURCE_CODE_PATH.csproj -IncludeReferencedProjects -Build -Properties Configuration=Release -Version 0.0.8
     - nuget push \*.nupkg $NUGET_API_KEY
