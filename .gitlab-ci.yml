@@ -35,6 +35,6 @@ deploy:
   stage: deploy
   script:
     - dotnet build -c Release --no-restore
-    - dotnet pack LibPing.Net/LibPing.Net.csproj -c Release --no-restore -p:PackageVersion=0.0.8 -o .
+    - dotnet pack LibPing.Net/LibPing.Net.csproj -c Release --no-restore -o .
     - dotnet nuget push "*.nupkg" -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
     #- nuget push \*.nupkg $NUGET_API_KEY
