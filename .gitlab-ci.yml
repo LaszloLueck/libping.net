@@ -34,5 +34,5 @@ securityanalysis:
 deploy:
   stage: deploy
   script:
-    - nuget pack $SOURCE_CODE_PATH.csproj -IncludeReferencedProjects -Build -Properties Configuration=Release -Version 0.0.8
+    - nuget pack $SOURCE_CODE_PATH/$SOURCE_CODE_PATH.csproj -IncludeReferencedProjects -Build -Properties Configuration=Release -Version 0.0.8
     - nuget push \*.nupkg $NUGET_API_KEY
