@@ -36,5 +36,5 @@ deploy:
   script:
     - dotnet build -c Release --no-restore
     - dotnet pack LibPing.Net/LibPing.Net.csproj -c Release --no-restore -o .
-    - dotnet nuget push "*.nupkg" -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
-    - dotnet nuget push "*.nupkg" -k $NEXUS_NUGET_API_KEY -s https://nexus.gretzki.ddns.net/repository/nuget.org-proxy/index.json
+    - dotnet nuget push "*.nupkg" --skip-duplicate -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+    - dotnet nuget push "*.nupkg" --skip-duplicate -k $NEXUS_NUGET_API_KEY -s https://nexus.gretzki.ddns.net/repository/nuget.org-proxy/index.json
