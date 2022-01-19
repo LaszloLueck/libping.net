@@ -36,4 +36,5 @@ deploy:
   script:
     - dotnet build
     - dotnet pack LibPing.Net/LibPing.Net.csproj --no-build -p:PackageVersion=0.0.8 -o .
+    - nuget update -self
     - nuget push \*.nupkg $NUGET_API_KEY
