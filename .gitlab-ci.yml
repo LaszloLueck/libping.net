@@ -34,7 +34,8 @@ securityanalysis:
 deploy:
   stage: deploy
   script:
-    - dotnet build
-    - dotnet pack LibPing.Net/LibPing.Net.csproj --no-build -p:PackageVersion=0.0.8 -o .
-    - nuget update -self
-    - nuget push \*.nupkg $NUGET_API_KEY
+    - dotnet build -c Release --no-restore
+    - dotnet pack LibPing.Net/LibPing.Net.csproj -c Release --no-restore -p:PackageVersion=0.0.8 -o .
+    - ENTRYPOINT ["dotnet", "nuget", "push", "*.nupkg"]
+    - CMD ["--api-key", $NUGET_API_KEY]
+    #- nuget push \*.nupkg $NUGET_API_KEY
