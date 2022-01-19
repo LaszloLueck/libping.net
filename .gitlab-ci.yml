@@ -33,8 +33,6 @@ securityanalysis:
 
 deploy:
   stage: deploy
-  variables:
-    PUSH_VERSION: date +"0.1.%y%m%d.%H%M"
   script:
-    - dotnet pack LibPing.Net/LibPing.Net.csproj -p:PackageVersion=$PUSH_VERSION -o .
+    - dotnet pack LibPing.Net/LibPing.Net.csproj -p:PackageVersion=0.0.8 -o .
     - nuget push \*.nupkg $NUGET_API_KEY
