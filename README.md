@@ -20,6 +20,13 @@ And for the other point, it feels for me very clumsy, when i know, that there is
 
 And it is a lot of fun to code with low level network sockets, i've learned al lot of things.
 
+Some tips and tricks and how the things could work, i learned from here
+
+http://www.java2s.com/Code/CSharp/Network/SimplePing.htm
+
+Very usefull code example
+
+
 I take the newest (from 1981) documentation from here about icmp
 
 https://datatracker.ietf.org/doc/html/rfc792
