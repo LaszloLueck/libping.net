@@ -185,6 +185,7 @@ Aha, we receive some more results.
 In the following, there are only the changed results described:
 - AddressFamily -> ok, we ping in ipv4 manner
 - TTL -> The pinged host send us a value how many hops he is away from our client. This one must interpreted as 64 - 58 = 6 + 1 Why + 1? In this case the pinged host does'nt know about our internal network. He knows only our public router. If you have a very complicated company net with a lot of internal routing, the value could be much higher.
+Probably I think, this could be the reason, why the response ttl does not work with ipv6. With an ipv6-address, the client is able to be the endpoint, there is no network router. Same goes for intermediate hops.
 - Type -> Aha, in ipv4 the Type for a valid echo reply is 0 (in ipv6 it is 129).
 The other changed things are more debugging things and i did'nt explain that. See in the rfc-792 if it is importand for you.
 
@@ -215,7 +216,19 @@ Now, you could see how traceroute work. We limit the ttl to the host to 3. The m
 But we reached the 3rd hop (endpoint) of this route.
 In my case it is: 89.1.16.161
 
-Very nice.
+And what is the context with traceroute?
+
+Ok, lets look.
+
+If we wrote a small app, that chain (e.g. from 1 to 30) and ping so long, until the type is EchoReply?
+
+It could be a simple for-each-loop.
+
+With the response endpoint of every intermediate step and the roundtriptime, you receive every hop from your client to the host.
+
+Nothing more does traceroute do.
+
+Very nice, indeed?
 
 And now, let's check if this could be a real scenario and use the ping from the operating system and check this:
 ```bash
