@@ -87,7 +87,7 @@ Lets look at the result.
 
 To fetch some results i've written a small app, that use lib and show the results on console.
 
-```csharp
+```c#
     public static async Task Main(string[] args)
     {
 
@@ -122,7 +122,7 @@ To fetch some results i've written a small app, that use lib and show the result
     }
 ```
 Here are some results. All results are fetched from a linux os (kubuntu 21.10).
-```bash
+```shell
 ➜  PingTest git:(main) ✗ sudo dotnet run
 Code: 0
 Address family: IpV6
@@ -162,7 +162,7 @@ Let's do a little different ping:
 `var response = await Icmp.Ping("1.1.1.1", 64, 3000, cts.Token);`
 
 We change the ip address to an ipv4 one. And let's see what happened:
-```bash
+```shell
 ➜  PingTest git:(main) ✗ sudo dotnet run
 Code: 0
 Address family: IpV4
@@ -193,7 +193,7 @@ And now, let's do a funny thing.
 `var response = await Icmp.Ping("1.1.1.1", 3, 3000, cts.Token);`
 
 We change the ttl from 64 to 3. Let's look to the result:
-```bash
+```shell
 ➜  PingTest git:(main) ✗ sudo dotnet run
 Code: 0
 Address family: IpV4
@@ -231,7 +231,7 @@ Nothing more does traceroute do.
 Very nice, indeed?
 
 And now, let's check if this could be a real scenario and use the ping from the operating system and check this:
-```bash
+```shell
 ➜  PingTest git:(main) ✗ ping 1.1.1.1 -4 -c 1 -t 3
 PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
 From 89.1.16.161 icmp_seq=1 Time to live exceeded
@@ -245,3 +245,131 @@ The lib does exactly the same things as the os ping do. But now, we have all the
 The returned type (and TypeString) comes also back correctly. In this case it is 11 (TimeExceeded)
 
 Wonderful.
+
+## Update 2022-01-20
+As described above, traceroute is simply a chain of pings where the ttl-value is increased by 1 for every hop, until the origin endpoint is reached.
+I changed the ordinary test ping method and enhance this thing a little bit.
+```c#
+public static async Task Main(string[] args)
+{
+        var hostNameOrAddress = "1.1.1.1";
+
+        try
+        {
+            var cts = new CancellationTokenSource(1000);
+
+            var cnt = 1;
+            var state = 3;
+            while (cnt <= 30 && state is not 0 and not 129)
+            {
+                var response = await Icmp.Ping(hostNameOrAddress, cnt, 500, true);
+                var writeLine = response.AddressFamily switch
+                {
+                    IpAddressFamily.IpV4 =>
+                        $"# {cnt} FROM: {response.Origin.Address} :: TTL: {response.Ttl} :: TYPE: {response.TypeString} IN: {response.RoundTripTime} ms",
+                    IpAddressFamily.IpV6 =>
+                        $"# {cnt} FROM: {response.Origin.Address} :: TYPE: {response.TypeString} IN: {response.RoundTripTime} ms;",
+                    _ => "Unknown address family received, received an updated library?"
+                };
+                Console.WriteLine(writeLine);
+                state = response.Type;
+                cnt++;
+            }
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine("Fucking error!");
+            Console.WriteLine($"Message: {exception.Message}");
+            Console.WriteLine($"ST: {exception.StackTrace}");
+        }
+    }
+```
+
+Lets explain some things.
+We build up a while-loop. The loop ends, when
+- the max hop count (30 per default for the most traceroute implementations) is received
+- the state of the result is 0 for ipv4 or 129 for ipv6 which means EchoReply (or endpoint reached).
+
+I put away some unused debug information and format the return a little bit (one liner and so on)
+Let's do some tests.
+
+First with an ipv4 ip address 1.1.1.1
+
+```shell
+➜  PingTest git:(main) ✗ sudo dotnet run
+# 1 FROM: 192.168.0.1 :: TTL: 64 :: TYPE: TimeExceeded IN: 4 ms
+# 2 FROM: 195.14.226.125 :: TTL: 254 :: TYPE: TimeExceeded IN: 14 ms
+# 3 FROM: 89.1.16.161 :: TTL: 253 :: TYPE: TimeExceeded IN: 6 ms
+# 4 FROM: 89.1.86.37 :: TTL: 252 :: TYPE: TimeExceeded IN: 6 ms
+# 5 FROM: 81.173.192.2 :: TTL: 251 :: TYPE: TimeExceeded IN: 8 ms
+# 6 FROM: 194.146.118.139 :: TTL: 249 :: TYPE: TimeExceeded IN: 8 ms
+# 7 FROM: 1.1.1.1 :: TTL: 58 :: TYPE: EchoReply IN: 7 ms
+```
+
+Wow, that looks pretty cool!
+And yes, i have a DSL-Connection, but this thing ist very fast.
+Let's use the ordinary traceroute from linux and make a check:
+Parameters are:
+-I --> use ICMP (instead of tcp 80)
+-n --> don't resolve Ip addresses
+-q 1 --> make 1 request (instead of 3)
+```shell
+➜  PingTest git:(main) ✗ traceroute -I -n -q 1 1.1.1.1
+traceroute to 1.1.1.1 (1.1.1.1), 30 hops max, 60 byte packets
+ 1  192.168.0.1  3.281 ms
+ 2  195.14.226.125  8.389 ms
+ 3  89.1.16.161  8.431 ms
+ 4  89.1.86.37  8.728 ms
+ 5  81.173.192.2  9.387 ms
+ 6  194.146.118.139  23.367 ms
+ 7  1.1.1.1  10.224 ms
+```
+
+OK, very impressive.
+Let's try another one:
+Traceroute to heise.de (a german it-magazine)
+
+```shell
+➜  PingTest git:(main) ✗ sudo dotnet run            
+# 1 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: TimeExceeded IN: 0 ms;
+# 2 FROM: 2001:4dd0:a2a:62::4acc :: TYPE: TimeExceeded IN: 0 ms;
+# 3 FROM: 2001:4dd0:a2b:df:dc40::c :: TYPE: TimeExceeded IN: 0 ms;
+# 4 FROM: 2001:4dd0:a2b:11:dc41::b :: TYPE: TimeExceeded IN: 0 ms;
+# 5 FROM: fe80::201:2eff:fe95:fd24%3 :: TYPE: NeighborAdvertisement IN: 0 ms;
+# 6 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: NeighborSolicitation IN: 0 ms;
+# 7 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: NeighborSolicitation IN: 0 ms;
+# 8 FROM: 2a02:2e0:12:32::2 :: TYPE: TimeExceeded IN: 0 ms;
+# 9 FROM: 2a02:2e0:3fe:0:c::1 :: TYPE: TimeExceeded IN: 0 ms;
+# 10 FROM: 2a02:2e0:3fe:1001:302:: :: TYPE: EchoReply IN: 0 ms;
+```
+
+Aha, nice types with a spooky fe80 local address from an internet hop. At now, i can't say what neighbor solicitation say, but, hey looks impressive.
+
+And i think, there is an issue with the measurement of the roundtriptime in my code.
+
+With ipv4 i see realistic values. With ipv6 all values are 0.
+
+And now the check with the ordinary traceroute:
+The new parameter -6 is, because without this traceroute does a ipv4 call.
+```shell
+➜  PingTest git:(main) ✗ traceroute -6 -I -n -q 1 heise.de
+traceroute to heise.de (2a02:2e0:3fe:1001:302::), 30 hops max, 80 byte packets
+ 1  2001:4dd6:5411:0:201:2eff:fe95:fd24  3.567 ms
+ 2  2001:4dd0:a2a:62::4acc  8.338 ms
+ 3  2001:4dd0:a2b:df:dc40::c  8.805 ms
+ 4  2001:4dd0:a2b:11:dc41::b  37.131 ms
+ 5  *
+ 6  *
+ 7  *
+ 8  2a02:2e0:12:32::2  12.599 ms
+ 9  2a02:2e0:3fe:0:c::1  13.170 ms
+10  2a02:2e0:3fe:1001:302::  12.918 ms
+```
+
+Oops, whats that? 5-7 is marked with a star (not resolvable)?
+But there are results...btw. in my resultset.
+
+## Conclusion
+With some lines of code, we build a simple traceroute function, that work with all os`s (linux, windows or mac or docker or what ever).
+
+Let's fix the measurement bug and ready!
