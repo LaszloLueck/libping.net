@@ -7,6 +7,19 @@ As easy as is, use nuget to include the lib (dll) to your project and use it.
 
 Or you download the sources (clone the repo) and compile it for yourself.
 
+## Motivation
+I found, that the current implementation of ping (https://docs.microsoft.com/de-de/dotnet/api/system.net.networkinformation.ping?view=net-6.0) in dotnet core (current 6.0.1)
+- is very buggy if you don´t use windows
+- use the ping command from operating system
+
+The buggy implementation prevent me to use this functionality inside a linux docker container.
+
+A ping from macos or linux returned in every case a timeout, if the ttl is set to lower than the pinged host is away.
+
+And for the other point, it feels for me very clumsy, when i know, that there is not a native implementation of things although there are all the stuff here to implement it correctly.
+
+And it is a lot of fun to code with low level network sockets, i've learned al lot of things.
+
 ## Usage
 Beware!
 
@@ -19,6 +32,7 @@ Thats sad, but not my fault.
 
 
 Anyway.
+
 
 If you use the lib in your project, simply do things as this (c# syntax):
 
