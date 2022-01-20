@@ -20,10 +20,20 @@ And for the other point, it feels for me very clumsy, when i know, that there is
 
 And it is a lot of fun to code with low level network sockets, i've learned al lot of things.
 
-## Usage
-Beware!
+I take the newest (from 1981) documentation from here about icmp
 
-As of operating systems restrictions (windows, linux and mac) you should run the app with the library with administrator privileges.
+https://datatracker.ietf.org/doc/html/rfc792
+
+and read / try to understand how it works.
+
+For debugging purposes, i use wireshark, to see directly what goes to the network and what comes back.
+
+As i say, very forensic and funny.
+
+## Usage
+**Beware!**
+
+**As of operating systems restrictions (windows, linux and mac) you should run the app with the library with administrator privileges.**
 
 E.g. https://docs.microsoft.com/de-de/windows/win32/winsock/tcp-ip-raw-sockets-2?redirectedfrom=MSDN
 
