@@ -71,12 +71,12 @@ public class IcmpResponse
         Code = addressFamily == IpAddressFamily.IpV4 ? data[21] : data[1];
         FromIp = fromIp;
         AddressFamily = addressFamily;
+        RoundTripTime = roundTripTime;
         if (addressFamily != IpAddressFamily.IpV4) return;
         Checksum = BitConverter.ToUInt16(data, 22);
         Identifier = BitConverter.ToInt16(data, 0);
         Sequence = BitConverter.ToInt16(data, 2);
         Ttl = data[8];
-        RoundTripTime = roundTripTime;
     }
 
     private static readonly Func<byte, IpAddressFamily, string> CalculateTypeString = (byteValue, addressFamily) =>
