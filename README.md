@@ -309,10 +309,15 @@ First with an ipv4 ip address 1.1.1.1
 Wow, that looks pretty cool!
 And yes, i have a DSL-Connection, but this thing ist very fast.
 Let's use the ordinary traceroute from linux and make a check:
+
 Parameters are:
+
 -I --> use ICMP (instead of tcp 80)
+
 -n --> don't resolve Ip addresses
+
 -q 1 --> make 1 request (instead of 3)
+
 ```shell
 ➜  PingTest git:(main) ✗ traceroute -I -n -q 1 1.1.1.1
 traceroute to 1.1.1.1 (1.1.1.1), 30 hops max, 60 byte packets
@@ -326,50 +331,48 @@ traceroute to 1.1.1.1 (1.1.1.1), 30 hops max, 60 byte packets
 ```
 
 OK, very impressive.
+
 Let's try another one:
+
 Traceroute to heise.de (a german it-magazine)
 
 ```shell
-➜  PingTest git:(main) ✗ sudo dotnet run            
-# 1 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: TimeExceeded IN: 0 ms;
-# 2 FROM: 2001:4dd0:a2a:62::4acc :: TYPE: TimeExceeded IN: 0 ms;
-# 3 FROM: 2001:4dd0:a2b:df:dc40::c :: TYPE: TimeExceeded IN: 0 ms;
-# 4 FROM: 2001:4dd0:a2b:11:dc41::b :: TYPE: TimeExceeded IN: 0 ms;
-# 5 FROM: fe80::201:2eff:fe95:fd24%3 :: TYPE: NeighborAdvertisement IN: 0 ms;
-# 6 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: NeighborSolicitation IN: 0 ms;
-# 7 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: NeighborSolicitation IN: 0 ms;
-# 8 FROM: 2a02:2e0:12:32::2 :: TYPE: TimeExceeded IN: 0 ms;
-# 9 FROM: 2a02:2e0:3fe:0:c::1 :: TYPE: TimeExceeded IN: 0 ms;
-# 10 FROM: 2a02:2e0:3fe:1001:302:: :: TYPE: EchoReply IN: 0 ms;
+➜  PingTest git:(main) ✗ sudo dotnet run                  
+# 1 FROM: 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: TimeExceeded IN: 4 ms;
+# 2 FROM: 2001:4dd0:a2a:62::4acc :: TYPE: TimeExceeded IN: 6 ms;
+# 3 FROM: 2001:4dd0:a2b:df:dc40::c :: TYPE: TimeExceeded IN: 7 ms;
+# 4 FROM: 2001:4dd0:a2b:11:dc41::b :: TYPE: TimeExceeded IN: 6 ms;
+# 5 FROM: fe80::201:2eff:fe95:fd24%3 :: TYPE: NeighborAdvertisement IN: 4261 ms;
+# 6 FROM: 2a02:2e0:11:17::1 :: TYPE: TimeExceeded IN: 11 ms;
+# 7 FROM: 2a02:2e0:10:1::1 :: TYPE: TimeExceeded IN: 10 ms;
+# 8 FROM: 2a02:2e0:12:32::2 :: TYPE: TimeExceeded IN: 174 ms;
+# 9 FROM: 2a02:2e0:3fe:0:c::1 :: TYPE: TimeExceeded IN: 10 ms;
+# 10 FROM: 2a02:2e0:3fe:1001:302:: :: TYPE: EchoReply IN: 10 ms;
 ```
 
-Aha, nice types with a spooky fe80 local address from an internet hop. At now, i can't say what neighbor solicitation say, but, hey looks impressive.
-
-And i think, there is an issue with the measurement of the roundtriptime in my code.
-
-With ipv4 i see realistic values. With ipv6 all values are 0.
+Aha, nice types with a spooky fe80 local address from an internet hop. At now, i can't say what neighbor Advertisement say, but, it looks impressive.
 
 And now the check with the ordinary traceroute:
+
 The new parameter -6 is, because without this traceroute does a ipv4 call.
 ```shell
 ➜  PingTest git:(main) ✗ traceroute -6 -I -n -q 1 heise.de
 traceroute to heise.de (2a02:2e0:3fe:1001:302::), 30 hops max, 80 byte packets
- 1  2001:4dd6:5411:0:201:2eff:fe95:fd24  3.567 ms
- 2  2001:4dd0:a2a:62::4acc  8.338 ms
- 3  2001:4dd0:a2b:df:dc40::c  8.805 ms
- 4  2001:4dd0:a2b:11:dc41::b  37.131 ms
- 5  *
- 6  *
+ 1  2001:4dd6:5411:0:201:2eff:fe95:fd24  3.133 ms
+ 2  2001:4dd0:a2a:62::4acc  9.827 ms
+ 3  2001:4dd0:a2b:df:dc40::c  8.174 ms
+ 4  2001:4dd0:a2b:11:dc41::b  9.276 ms
+ 5  2001:7f8::3012:0:2  12.706 ms
+ 6  2a02:2e0:11:17::1  12.714 ms
  7  *
- 8  2a02:2e0:12:32::2  12.599 ms
- 9  2a02:2e0:3fe:0:c::1  13.170 ms
-10  2a02:2e0:3fe:1001:302::  12.918 ms
+ 8  2a02:2e0:12:32::2  12.578 ms
+ 9  2a02:2e0:3fe:0:c::1  12.631 ms
+10  2a02:2e0:3fe:1001:302::  12.688 ms
 ```
 
-Oops, whats that? 5-7 is marked with a star (not resolvable)?
+Oops, whats that? #7 is marked with a star (not resolvable)?
 But there are results...btw. in my resultset.
 
 ## Conclusion
 With some lines of code, we build a simple traceroute function, that work with all os`s (linux, windows or mac or docker or what ever).
 
-Let's fix the measurement bug and ready!
