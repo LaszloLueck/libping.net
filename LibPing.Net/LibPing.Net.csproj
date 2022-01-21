@@ -21,11 +21,13 @@
     <PropertyGroup>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageSampleFile>SAMPLES.md</PackageSampleFile>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="../LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
 		<None Include="../README.md" Pack="true" PackagePath="README.md" />
+		<None Include="../SAMPLES.md" Pack="true" PackagePath="SAMPLES.md" />
     </ItemGroup>
 
 </Project>
