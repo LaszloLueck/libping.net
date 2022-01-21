@@ -251,37 +251,34 @@ As described above, traceroute is simply a chain of pings where the ttl-value is
 I changed the ordinary test ping method and enhance this thing a little bit.
 ```c#
 public static async Task Main(string[] args)
-{
-        var hostNameOrAddress = "1.1.1.1";
+    {
+        var hostNameOrAddress = "heise.de";
 
-        try
-        {
-            var cts = new CancellationTokenSource(1000);
-
-            var cnt = 1;
+        var cnt = 1;
             var state = 3;
             while (cnt <= 30 && state is not 0 and not 129)
             {
-                var response = await Icmp.Ping(hostNameOrAddress, cnt, 500, true);
-                var writeLine = response.AddressFamily switch
+                try
                 {
-                    IpAddressFamily.IpV4 =>
-                        $"# {cnt} FROM: {response.Origin.Address} :: TTL: {response.Ttl} :: TYPE: {response.TypeString} IN: {response.RoundTripTime} ms",
-                    IpAddressFamily.IpV6 =>
-                        $"# {cnt} FROM: {response.Origin.Address} :: TYPE: {response.TypeString} IN: {response.RoundTripTime} ms;",
-                    _ => "Unknown address family received, received an updated library?"
-                };
-                Console.WriteLine(writeLine);
-                state = response.Type;
+                    var cts = new CancellationTokenSource(20000);
+                    var response = await Icmp.Ping(hostNameOrAddress, cnt, 500, true, cts.Token);
+                    var writeLine = response.AddressFamily switch
+                    {
+                        IpAddressFamily.IpV4 =>
+                            $"{cnt.ToString("D2")} {response.Origin.Address} :: TTL: {response.Ttl} :: TYPE: {response.TypeString} ({response.Type}) in {response.RoundTripTime} ms",
+                        IpAddressFamily.IpV6 =>
+                            $"{cnt.ToString("D2")} {response.Origin.Address} :: TYPE: {response.TypeString} ({response.Type}) in {response.RoundTripTime} ms;",
+                        _ => "Unknown address family received, received an updated library?"
+                    };
+                    Console.WriteLine(writeLine);
+                    state = response.Type;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{cnt:D2} :: {ex.Message} :: ERROR possible drop icmp");
+                }
                 cnt++;
             }
-        }
-        catch (Exception exception)
-        {
-            Console.WriteLine("Fucking error!");
-            Console.WriteLine($"Message: {exception.Message}");
-            Console.WriteLine($"ST: {exception.StackTrace}");
-        }
     }
 ```
 
@@ -289,7 +286,10 @@ Lets explain some things.
 We build up a while-loop. The loop ends, when
 - the max hop count (30 per default for the most traceroute implementations) is received
 - the state of the result is 0 for ipv4 or 129 for ipv6 which means EchoReply (or endpoint reached).
+- the try catch block inside the loop, brings up a possible exception (mostly token cancellation, if the pinged host drops icmp packages) 
 
+I set the cancellation token inside the loop, so in every loop step the token time where reset.
+I set the cancellation token time to a very high amount (you can make that configurable for your own purposes), to receive long running neighbor things.
 I put away some unused debug information and format the return a little bit (one liner and so on)
 Let's do some tests.
 
@@ -372,6 +372,21 @@ traceroute to heise.de (2a02:2e0:3fe:1001:302::), 30 hops max, 80 byte packets
 
 Oops, whats that? #7 is marked with a star (not resolvable)?
 But there are results...btw. in my resultset.
+
+And here is a check, that the exception handling works as expected.
+```shell
+➜  PingTest git:(main) ✗ sudo dotnet run
+01 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: TimeExceeded (3) in 5 ms;
+02 2001:4dd0:a2a:62::4acc :: TYPE: TimeExceeded (3) in 6 ms;
+03 2001:4dd0:a2b:e0:dc30::c :: TYPE: TimeExceeded (3) in 6 ms;
+04 2001:4dd0:a2b:e9:dc31::b :: TYPE: TimeExceeded (3) in 13 ms;
+05 2001:7f8::3012:0:2 :: TYPE: TimeExceeded (3) in 10 ms;
+06 :: The operation was canceled. :: ERROR possible drop icmp
+07 2001:4dd6:5411:0:201:2eff:fe95:fd24 :: TYPE: NeighborSolicitation (135) in 3003 ms;
+08 2a02:2e0:12:32::2 :: TYPE: TimeExceeded (3) in 9 ms;
+09 2a02:2e0:3fe:0:c::1 :: TYPE: TimeExceeded (3) in 10 ms;
+10 2a02:2e0:3fe:1001:302:: :: TYPE: EchoReply (129) in 9 ms;
+```
 
 ## Conclusion
 With some lines of code, we build a simple traceroute function, that work with all os`s (linux, windows or mac or docker or what ever).
