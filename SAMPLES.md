@@ -1,7 +1,6 @@
 # Before we begin
 If you use windows (i have win 10 and win 11) it could be possible that you setup 2 firewall rules.
 It could be possible because i visit the following behavior (all tests done with admin / sudo):
-My ubuntu on WSL / WSL2 resolves only IPV4 because of implementation limitations of wsl
 
 1. Windows 11 Machine A - Native - does not work
 2. Windows 11 Machine A - WSL2 - does work
@@ -11,15 +10,17 @@ My ubuntu on WSL / WSL2 resolves only IPV4 because of implementation limitations
 6. Windows 10 Machine C - WSL 2 - does work
 
 Solution (on Machine A)?
+
 After hours of struggling, i found a solution.
 Obviously WSL does not use the Windows Firewall, so icmp packets going out in normal manner.
-I must setup 2 new INCOMING rules with relatively wide open set rules.
+
+I would setup 2 new INCOMING rules with relatively wide open set rules.
 Protocol for rule 1 is icmp4
 Protocol for rule 2 is icmp6
 All apps, all networks, all interfaces and then it works.
 
 When i wrote this text, i think it would clear why this behavior exists...
-Let's look the not working sequence:
+Let's look the non working sequence:
 ````shell
 > dotnet run 1.1.1.1
 01 * :: The operation was canceled. ERROR possible drop icmp
@@ -381,3 +382,116 @@ And here is a check, that the exception handling works as expected.
 08 2a02:2e0:12:32::2 :: TYPE: TimeExceeded (3) in 9 ms;
 09 2a02:2e0:3fe:0:c::1 :: TYPE: TimeExceeded (3) in 10 ms;
 10 2a02:2e0:3fe:1001:302:: :: TYPE: EchoReply (129) in 9 ms;
+```
+## Traceroute 2
+I found out, that the method 
+
+`(await Dns.GetHostEntryAsync(response.Origin.Address)).HostName`
+
+work not correctly, even when you give a CancellationToken to the async method.
+
+Why? No clue!
+
+I´ve implemented a "helper" method in the lib, that resolve the problem for you.
+
+````c#
+    public static readonly Func<string, Task<string>> AsyncResolveHostName =
+        ipAddress =>
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Dns.GetHostEntry(ipAddress).HostName;
+                }
+                catch (Exception)
+                {
+                    return ipAddress;
+                }
+            });
+        };
+````
+
+It trys to resolve the ip address in a synced / blocking manner. But surrounded with a Task.
+
+That´s all.
+
+In your code, you wait for the response for a configurable amount of time.
+
+`hostNameTask.Wait(200) ? hostNameTask.Result : response.Origin.Address.ToString();`
+
+If the wait (in this case after 200ms) gets no result, the false leg returned the original given value (ip address).
+
+Ah and another one. The main method get the ip address / host name to traceroute from outside.
+
+In Linux you can now call:
+
+`sudo dotnet run one.one.one.one`
+
+or
+
+`sudo dotnet run 1.1.1.1`
+
+With windows you can call:
+
+`dotnet run one.one.one.one`
+
+or
+
+`dotnet run 1.1.1.1`
+
+Here is the final code of the traceroute main method.
+
+````c#
+    public static async Task Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.WriteLine("missing at least one parameter ip-address or hostname");
+            Environment.Exit(-127);
+        }
+
+        var hostNameOrAddress = args[0];
+
+        var cnt = 1;
+        var state = 3;
+        while (cnt <= 30 && state is not 0 and not 129)
+        {
+            try
+            {
+                var cts = new CancellationTokenSource(3000);
+                var response = await Icmp.Ping(hostNameOrAddress, cnt, 2000, true, cts.Token);
+
+                var hostNameTask = Icmp.AsyncResolveHostName(response.Origin.Address.ToString());
+                var hostName = hostNameTask.Wait(200) ? hostNameTask.Result : response.Origin.Address.ToString();
+                var writeLine = response.AddressFamily switch
+                {
+                    IpAddressFamily.IpV4 =>
+                        $"{cnt.ToString("D2")} {response.Origin.Address} ({hostName}) :: TTL: {response.Ttl} :: TYPE: {response.TypeString} ({response.Type}) in {response.RoundTripTime} ms",
+                    IpAddressFamily.IpV6 =>
+                        $"{cnt.ToString("D2")} {response.Origin.Address} ({hostName}) :: TYPE: {response.TypeString} ({response.Type}) in {response.RoundTripTime} ms;",
+                    _ => "Unknown address family received, received an updated library?"
+                };
+                Console.WriteLine(writeLine);
+                state = response.Type;
+            }
+            catch (OperationCanceledException operationCanceledException)
+            {
+                Console.WriteLine($"{cnt:D2} * :: {operationCanceledException.Message} ERROR possible drop icmp");
+            }
+            catch (SocketException socketException)
+            {
+                Console.WriteLine($"An error while tracerouting an address occured. {socketException.Message}");
+                Console.WriteLine($"Stacktrace: {socketException.StackTrace}");
+                Environment.Exit(-127);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"a default error occured, gave up :: {ex.Message}");
+                Console.WriteLine($"Stacktrace: {ex.StackTrace}");
+            }
+
+            cnt++;
+        }
+    }
+````
