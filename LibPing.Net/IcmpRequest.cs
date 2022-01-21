@@ -69,14 +69,15 @@ internal class IcmpRequest
             IpAddressFamily.IpV6 => 0x80,
             _ => throw new InvalidEnumArgumentException()
         };
-
+#pragma warning disable
     private static readonly Func<string, CancellationToken, Task<IPEndPoint>> GetEndpointFromString =
         async (endpointAsString, cancellationToken) => !IPAddress.TryParse(endpointAsString, out var ipAddress)
             ? await ResolveIpEndPoint(endpointAsString, cancellationToken)
             : ipAddress is not null
                 ? new IPEndPoint(ipAddress, 0)
                 : throw new ArgumentNullException(nameof(ipAddress));
-
+#pragma warning restore
+    
     private static readonly Func<int, byte[]> GenerateRandomData = length =>
     {
         var data = new byte[length];

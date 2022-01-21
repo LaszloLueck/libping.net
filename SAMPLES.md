@@ -1,3 +1,62 @@
+# Before we begin
+If you use windows (i have win 10 and win 11) it could be possible that you setup 2 firewall rules.
+It could be possible because i visit the following behavior (all tests done with admin / sudo):
+My ubuntu on WSL / WSL2 resolves only IPV4 because of implementation limitations of wsl
+
+1. Windows 11 Machine A - Native - does not work
+2. Windows 11 Machine A - WSL2 - does work
+3. Windows 11 Machine B - Native - does work
+4. Windows 11 Machine B - WSL 2 - does work
+5. Windows 10 Machine C - Native - does work
+6. Windows 10 Machine C - WSL 2 - does work
+
+Solution (on Machine A)?
+After hours of struggling, i found a solution.
+Obviously WSL does not use the Windows Firewall, so icmp packets going out in normal manner.
+I must setup 2 new INCOMING rules with relatively wide open set rules.
+Protocol for rule 1 is icmp4
+Protocol for rule 2 is icmp6
+All apps, all networks, all interfaces and then it works.
+
+When i wrote this text, i think it would clear why this behavior exists...
+Let's look the not working sequence:
+````shell
+> dotnet run 1.1.1.1
+01 * :: The operation was canceled. ERROR possible drop icmp
+02 * :: The operation was canceled. ERROR possible drop icmp
+03 * :: The operation was canceled. ERROR possible drop icmp
+04 * :: The operation was canceled. ERROR possible drop icmp
+05 * :: The operation was canceled. ERROR possible drop icmp
+06 * :: The operation was canceled. ERROR possible drop icmp
+07 1.1.1.1 (one.one.one.one) :: TTL: 58 :: TYPE: EchoReply (0) in 8 ms
+````
+Look at the last icmp entry! That works.
+
+If we look at the chain, we do the following
+
+Request 1: TTL 1 -> 127.0.1.1 send to 1.1.1.1
+
+Response 1: TTL 64 --> 192.168.0.1 answered (instead of 1.1.1.1) to 127.0.1.1
+
+It could be possible, that only the EchoReply on end is valid for the firewall, because
+a request to 1.1.1.1 would be answered by 1.1.1.1
+
+All other cases answered an other endpoint than the requested one.
+Obviously that drops the windows firewall.
+
+After i setup the 2 rules for icmpv4 and icmpv6 all things working well.
+
+````shell
+> dotnet run 1.1.1.1
+01 192.168.0.1 (192.168.0.1) :: TTL: 64 :: TYPE: TimeExceeded (11) in 5 ms
+02 195.14.226.125 (bras-vc2.netcologne.de) :: TTL: 254 :: TYPE: TimeExceeded (11) in 8 ms
+03 89.1.16.161 (ip-core-eup2-ae12.netcologne.de) :: TTL: 253 :: TYPE: TimeExceeded (11) in 6 ms
+04 89.1.86.37 (ip-core-net1-et9-2-2.netcologne.de) :: TTL: 252 :: TYPE: TimeExceeded (11) in 7 ms
+05 81.173.192.2 (bdr-net1-ae1.netcologne.de) :: TTL: 251 :: TYPE: TimeExceeded (11) in 7 ms
+06 194.146.118.139 (as13335.dusseldorf.megaport.com) :: TTL: 249 :: TYPE: TimeExceeded (11) in 8 ms
+07 1.1.1.1 (one.one.one.one) :: TTL: 58 :: TYPE: EchoReply (0) in 7 ms
+````
+
 # Examples
 All examples uses the libping.net library.
 
