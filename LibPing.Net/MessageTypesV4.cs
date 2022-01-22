@@ -1,5 +1,8 @@
 ﻿namespace LibPing.Net;
 
+/// <summary>
+/// message types for ipv4 from documentation of rfc-792
+/// </summary>
 public enum MessageTypeV4
 {
     EchoReply = 0,
@@ -15,6 +18,9 @@ public enum MessageTypeV4
     InformationReply = 16
 }
 
+/// <summary>
+/// message types for ipv6 from documentation of rfc-792
+/// </summary>
 public enum MessageTypeV6
 {
     DestinationUnreachable = 1,
@@ -54,6 +60,9 @@ public enum MessageTypeV6
     ReservedForExpansionOfIcmpV6InformationalMessages = 255
 }
 
+/// <summary>
+/// Internal enum for handling the ip address family (ipv4 / ipv6)
+/// </summary>
 public enum IpAddressFamily
 {
     IpV4,

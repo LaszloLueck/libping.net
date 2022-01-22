@@ -2,6 +2,9 @@
 
 namespace LibPing.Net;
 
+/// <summary>
+/// class which contains methods for icmp (rfc 792) also called ping
+/// </summary>
 public class Icmp
 {
     /// <summary>

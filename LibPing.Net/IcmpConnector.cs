@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 
 namespace LibPing.Net;
 
+/// <summary>
+/// class that do the socket connection and call a ping
+/// </summary>
 public static class IcmpConnector
 {
     internal static async Task<IcmpResponse> Ping(IcmpRequest icmpRequest, CancellationToken cancellationToken)
