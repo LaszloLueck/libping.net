@@ -70,6 +70,9 @@ OR
 
 `var response = await Icmp.Ping("2606:4700:4700::1111", 64, 3000, true, cts.Token);`
 
+OR (in case that you need it in synchronous manner)
+
+`var respnse = Icmp.PingSync("hostNameOrIp", ttl, timeout, dontFragment)`
 
 
 The method Ping(...) runs asynchron, so it´s in your app-code to await the things.
