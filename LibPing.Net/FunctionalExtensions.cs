@@ -17,4 +17,15 @@ internal static class FunctionalExtensions
         for (var i = 0; i < list.Length; i += n)
             yield return list[i];
     }
+    
+    public static readonly Func<byte, IpAddressFamily, string> CalculateTypeString = (byteValue, addressFamily) =>
+    {
+        return addressFamily switch
+        {
+            IpAddressFamily.IpV4 => ((MessageTypeV4) byteValue).ToString(),
+            IpAddressFamily.IpV6 => ((MessageTypeV6) byteValue).ToString(),
+            _ => "IPAddressFamily not supported!"
+        };
+    };
+    
 }

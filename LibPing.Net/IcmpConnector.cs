@@ -55,8 +55,16 @@ public static class IcmpConnector
         var receivedEndpoint = (IPEndPoint) received.RemoteEndPoint;
         var payloadSize = received.ReceivedBytes;
 
-        return new IcmpResponse(receivedEndpoint, payloadSize, returnedPayload.Take(payloadSize).ToArray()
-            , icmpRequest.IpEndPointFrom, icmpRequest.AddressFamily, sw.ElapsedMilliseconds);
+        return icmpRequest.AddressFamily switch
+        {
+            IpAddressFamily.IpV4 => new IcmpResponseV4(receivedEndpoint, payloadSize,
+                returnedPayload.Take(payloadSize).ToArray()
+                , icmpRequest.IpEndPointFrom, icmpRequest.AddressFamily, sw.ElapsedMilliseconds),
+            IpAddressFamily.IpV6 => new IcmpResponseV6(receivedEndpoint, payloadSize,
+                returnedPayload.Take(payloadSize).ToArray()
+                , icmpRequest.IpEndPointFrom, icmpRequest.AddressFamily, sw.ElapsedMilliseconds),
+            _ => throw new InvalidEnumArgumentException()
+        };
     }
 
     private static readonly Func<int, byte[], int, int, int, byte[]> GetBytes =

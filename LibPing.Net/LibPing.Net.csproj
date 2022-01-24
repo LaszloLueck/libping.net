@@ -5,14 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.1.9</PackageVersion>
+        <PackageVersion>0.1.10</PackageVersion>
         <Title>LibPing.Net</Title>
         <Authors>Laszlo.Lueck</Authors>
         <Description>This class implements the ping functionality of the Icmp standard RFC-792. The library is completely written with low level sockets in C#. To use it you have to be administrator / root due to operating system restrictions. But the library works correctly under Windows / Linux / MacOS. The DotnetCore standard ping library uses the operating system methods for ping and passes the results up, which is very clumsy.</Description>
         <Copyright>Laszlo Lueck</Copyright>
         <PackageProjectUrl>https://github.com/LaszloLueck/libping.net</PackageProjectUrl>
-        <RepositoryUrl>https://gitlab.com/Laszlo.Lueck/libping.net</RepositoryUrl>
-        <PackageReleaseNotes>only some descriptions</PackageReleaseNotes>
+        <RepositoryUrl>https://github.com/LaszloLueck/libping.net</RepositoryUrl>
+        <PackageReleaseNotes>split icmpresponse to ipv6 and ipv4</PackageReleaseNotes>
         <PackageId>LibPing.Net</PackageId>
         <PackageLicenseUrl></PackageLicenseUrl>
 		
