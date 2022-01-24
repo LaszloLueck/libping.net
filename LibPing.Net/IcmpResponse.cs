@@ -54,7 +54,7 @@ public class IcmpResponse
 /// <summary>
 /// return object from ping if result is address family ipv4. It delivers a lot more information as the standard operating system ping command. 
 /// </summary>
-internal class IcmpResponseV4 : IcmpResponse
+public class IcmpResponseV4 : IcmpResponse
 {
     /// <summary>
     /// the returned ttl (only ipv4)
@@ -100,7 +100,7 @@ internal class IcmpResponseV4 : IcmpResponse
 /// <summary>
 /// return object from ping if result is address family ipv6. It delivers a lot more information as the standard operating system ping command. 
 /// </summary>
-internal class IcmpResponseV6 : IcmpResponse
+public class IcmpResponseV6 : IcmpResponse
 {
     internal IcmpResponseV6(IPEndPoint origin, int payloadSize, byte[] data, IPEndPoint? fromIp,
         IpAddressFamily addressFamily, long roundTripTime)
