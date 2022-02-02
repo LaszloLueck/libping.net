@@ -5,7 +5,7 @@ namespace LibPing.Net;
 /// <summary>
 /// class which contains methods for icmp (rfc 792) also called ping
 /// </summary>
-public class Icmp
+public static class Icmp
 {
     /// <summary>
     /// process an ICMP echo (RFC-792) command, also called ping in an blocking manner. It does the job with both IPv4 and IPv6.
@@ -52,6 +52,7 @@ public class Icmp
     /// <summary>
     /// As of standard Dns.GetHostEntryAsync is not cancelable (yes you can give a CancellationToken, but it does not work), here is a replacement for it.
     /// </summary>
+    [Obsolete("I remove the method in the next version because it has nothing to do with the topic of the library")]
     public static readonly Func<string, Task<string>> AsyncResolveHostName =
         ipAddress =>
         {
