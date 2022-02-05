@@ -17,7 +17,7 @@ internal static class FunctionalExtensions
         for (var i = 0; i < list.Length; i += n)
             yield return list[i];
     }
-    
+
     public static readonly Func<byte, IpAddressFamily, string> CalculateTypeString = (byteValue, addressFamily) =>
     {
         return addressFamily switch
@@ -27,5 +27,7 @@ internal static class FunctionalExtensions
             _ => "IPAddressFamily not supported!"
         };
     };
-    
+
+    internal static async Task<IEnumerable<T>> ResolveTasks<T>(this IEnumerable<Task<T>> tasks) =>
+        await Task.WhenAll(tasks);
 }
