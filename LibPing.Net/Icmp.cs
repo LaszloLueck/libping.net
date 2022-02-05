@@ -49,24 +49,4 @@ public static class Icmp
         return await IcmpConnector.Ping(request, cancellationToken);
     }
     
-    /// <summary>
-    /// As of standard Dns.GetHostEntryAsync is not cancelable (yes you can give a CancellationToken, but it does not work), here is a replacement for it.
-    /// </summary>
-    [Obsolete("I remove the method in the next version because it has nothing to do with the topic of the library")]
-    public static readonly Func<string, Task<string>> AsyncResolveHostName =
-        ipAddress =>
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    return Dns.GetHostEntry(ipAddress).HostName;
-                }
-                catch (Exception)
-                {
-                    return ipAddress;
-                }
-            });
-        };
-    
 }
