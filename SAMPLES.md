@@ -230,6 +230,69 @@ The lib does exactly the same things as the os ping do. But now, we have all the
 
 The returned type (and TypeString) comes also back correctly. In this case it is 11 (TimeExceeded)
 
+## 2022-02-05 Built in TRACEROUTE
+In release 0.1.14 of this lib, i deliver a built in function of traceroute.
+It´s easy to use as you can see in the following example.
+
+````c#
+    public static async Task Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.WriteLine("missing at least one parameter ip-address or hostname");
+            Environment.Exit(-127);
+        }
+
+
+        var hostNameOrAddress = args[0];
+
+        var l = Traceroute.DoTraceroute(hostNameOrAddress, 30, 1000);
+
+        await l.ForEachAsync(response =>
+        {
+            response.Match(leftResult => Console.WriteLine($"{leftResult.Hop} : {leftResult.Exception.Message}"),
+                rightResult =>
+                    Console.WriteLine(
+                        $"{rightResult.Hop} : {rightResult.Origin?.Address.ToString()} : {rightResult.RoundTripTime} ms : {rightResult.State}"));
+        });
+
+
+        Console.WriteLine("ready");
+    }
+
+````
+
+The method returns an `IAsyncEnumerable`. That´s because of the inner handling of the traceroute method.
+It yields every result, so it is very asynchronous.
+
+If you wish to select / foreach every result, you must import `System.Linq.Async`.
+
+The result type of the `IAsyncEnumerable` is an Either<LEFT,RIGHT> type.
+
+Some times away, i code in Scala and within Scala it is a very useful type when you return on the right hand the "good" result and on the left hand the "bad" one.
+In the processing you can match the left and the right and handle it separately.
+
+As for an example, if the request timed out / or the cancellation token throws an exception because of timeout, the result returned a left hand with the exception and the current hop.
+If the result returned a valid response, the right hand where filled.
+So, the execution result looks as follows (tracerouting a domain spiegel.de, from my location i know there is at least one hop that drops the ping) :
+
+````shell
+➜  PingTest git:(main) ✗ sudo dotnet run spiegel.de
+1 : 172.31.112.1 : 4 ms : TimeExceeded
+2 : 192.168.0.1 : 0 ms : TimeExceeded
+3 : 195.14.226.125 : 5 ms : TimeExceeded
+4 : 89.1.16.169 : 5 ms : TimeExceeded
+5 : 81.173.192.118 : 25 ms : TimeExceeded
+6 : 80.81.192.218 : 9 ms : TimeExceeded
+7 : The operation was canceled.
+8 : 80.95.144.117 : 9 ms : TimeExceeded
+9 : 128.65.210.8 : 9 ms : EchoReply
+ready
+````
+As you can see on hop 7, the cancellation token was thrown an exception because of timeout and the left hand returned the exception and the hop.
+
+For that case, i write the exception message to the Console.
+The right hand do some other stuff (writes other text). Here you can do a resolving dns names for the ip-address or other useful things.
 
 ## TRACEROUTE
 
