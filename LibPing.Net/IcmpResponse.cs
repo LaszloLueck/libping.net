@@ -71,6 +71,8 @@ public class IcmpResponseV4 : IcmpResponse
     /// </summary>
     public readonly int Identifier;
 
+    public readonly MessageTypeV4 TypeEnum;
+
     /// <summary>
     /// the sequence number from response
     /// </summary>
@@ -84,6 +86,7 @@ public class IcmpResponseV4 : IcmpResponse
         Data = data.ToImmutableArray();
         Type = addressFamily == IpAddressFamily.IpV4 ? data[20] : data[0];
         TypeString = FunctionalExtensions.CalculateTypeString(Type, addressFamily);
+        TypeEnum = (MessageTypeV4) Type;
         Code = addressFamily == IpAddressFamily.IpV4 ? data[21] : data[1];
         FromIp = fromIp;
         AddressFamily = addressFamily;
@@ -102,6 +105,8 @@ public class IcmpResponseV4 : IcmpResponse
 /// </summary>
 public class IcmpResponseV6 : IcmpResponse
 {
+    public MessageTypeV6 TypeEnum;
+    
     internal IcmpResponseV6(IPEndPoint origin, int payloadSize, byte[] data, IPEndPoint? fromIp,
         IpAddressFamily addressFamily, long roundTripTime)
     {
@@ -110,6 +115,7 @@ public class IcmpResponseV6 : IcmpResponse
         Data = data.ToImmutableArray();
         Type = addressFamily == IpAddressFamily.IpV4 ? data[20] : data[0];
         TypeString = FunctionalExtensions.CalculateTypeString(Type, addressFamily);
+        TypeEnum = (MessageTypeV6) Type;
         Code = addressFamily == IpAddressFamily.IpV4 ? data[21] : data[1];
         FromIp = fromIp;
         AddressFamily = addressFamily;

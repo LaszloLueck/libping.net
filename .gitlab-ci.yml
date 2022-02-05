@@ -32,6 +32,11 @@ securityanalysis:
     - security-scan ./LibPing.Net.sln
 
 deploy:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: never
   stage: deploy
   script:
     - dotnet build -c Release --no-restore
