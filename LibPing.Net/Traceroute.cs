@@ -14,8 +14,8 @@ public static class Traceroute
     /// <param name="ipAddressOrHost">ip or hostname to traceroute</param>
     /// <param name="maxHops">in most cases 30 is a good value</param>
     /// <param name="receiveTimeout">after this time, the current ping gave up and the next hop is in the row</param>
-    /// <returns></returns>
-    public static async IAsyncEnumerable<TracerouteResponse> DoTraceroute(string ipAddressOrHost, int maxHops,
+    /// <returns>An Either type (simple implementation of scala like Either). returns a right value if all things went well and a left when there was an error in one of the steps.</returns>
+    public static async IAsyncEnumerable<Either<TracerouteLeftResult, TracerouteResponse>> DoTraceroute(string ipAddressOrHost, int maxHops,
         int receiveTimeout)
     {
         var hop = 1;
@@ -23,14 +23,14 @@ public static class Traceroute
         while (hop <= maxHops && tp is not 0 and not 129)
         {
             var tR = await GetTracerouteResponse(ipAddressOrHost, receiveTimeout, hop);
-            tp = tR.Type;
+            tR.DoRight(r => tp = r.Type);
             hop++;
             yield return tR;
         }
 
     }
 
-    private static async Task<TracerouteResponse> GetTracerouteResponse(string ipOrAddress, int receiveTimeout, int hop)
+    private static async Task<Either<TracerouteLeftResult, TracerouteResponse>> GetTracerouteResponse(string ipOrAddress, int receiveTimeout, int hop)
     {
         var token = new CancellationTokenSource(receiveTimeout).Token;
 
@@ -41,7 +41,7 @@ public static class Traceroute
         }
         catch (Exception exception)
         {
-            return new TracerouteResponse(hop, 0, null, exception.Message, -1);
+            return new TracerouteLeftResult(exception, hop);
         }
     }
 }
