@@ -91,4 +91,7 @@ If you don´t believe this, rename your ping command and try to run the dotnet c
 
 Please look at the <a href="SAMPLES.md">SAMPLES.md</a> document to checkout how the things work and how you could use the lib to build ping and traceroute methods.
 
+## 2022-02-05 Implementation of traceroute in this library
+As a result of a request, i implement a traceroute function in this library. See the samples.md for an example of usage. 
+
 Have a great day!
