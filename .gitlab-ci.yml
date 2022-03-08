@@ -1,4 +1,4 @@
-image: nexus.gretzki.ddns.net:10501/alpine-dotnet-sdk:latest
+image: laszlo/alpine-dotnet-sdk:latest
 
 variables:
   OBJECTS_DIRECTORY: obj
