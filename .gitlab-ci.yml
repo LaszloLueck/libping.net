@@ -1,4 +1,4 @@
-image: laszlo/alpine-dotnet-sdk:latest
+image: laszlo/containerruntimeglobal-build-slim:latest
 
 variables:
   OBJECTS_DIRECTORY: obj
@@ -29,6 +29,7 @@ tests:
 securityanalysis:
   stage: test
   script:
+    - 'dotnet tool install --global security-scan'
     - security-scan ./LibPing.Net.sln
 
 deploy:
@@ -38,6 +39,8 @@ deploy:
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
       when: never
   stage: deploy
+  variables:
+    DOCKER_HOST: tcp://172.17.0.1:2375
   script:
     - dotnet build -c Release --no-restore
     - dotnet pack LibPing.Net/LibPing.Net.csproj -c Release --no-restore -o .
