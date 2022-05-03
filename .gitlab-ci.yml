@@ -43,7 +43,7 @@ codeanalysis:
       - .sonar/cache
   only:
     - merge_requests
-    - master
+    - main
     - develop
   script:
     - "apt-get update"
