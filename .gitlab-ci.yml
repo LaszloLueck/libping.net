@@ -21,6 +21,17 @@ build:
   script:
     - dotnet build --no-restore
 
+tests:
+  stage: test
+  script:
+    - dotnet test --no-restore
+
+securityanalysis:
+  stage: test
+  script:
+    - 'dotnet tool install --global security-scan'
+    - security-scan ./LibPing.Net.sln
+
 codeanalysis:
   stage: test
   variables:
@@ -44,17 +55,6 @@ codeanalysis:
     - "dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=\"../.coverlet/\""
     - "dotnet sonarscanner end /d:sonar.login=\"$SONAR_TOKEN\""
   allow_failure: true
-
-tests:
-  stage: test
-  script:
-    - dotnet test --no-restore
-
-securityanalysis:
-  stage: test
-  script:
-    - 'dotnet tool install --global security-scan'
-    - security-scan ./LibPing.Net.sln
 
 deploy:
   rules:
