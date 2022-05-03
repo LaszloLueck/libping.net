@@ -21,6 +21,30 @@ build:
   script:
     - dotnet build --no-restore
 
+codeanalysis:
+  stage: test
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  only:
+    - merge_requests
+    - master
+    - develop
+  script:
+    - "apt-get update"
+    - "apt-get install -y openjdk-11-jre"
+    - "java --version"
+    - "dotnet tool install --global dotnet-sonarscanner"
+    - "dotnet sonarscanner begin /k:\"$SONAR_PROJECT_KEY\" /d:sonar.cs.opencover.reportsPaths=\".coverlet/coverage.opencover.xml\" /d:sonar.login=\"$SONAR_TOKEN\" /d:\"sonar.host.url=$SONAR_HOST_URL\" /o:\"$SONAR_ORGANIZATION\" "
+    - "dotnet build"
+    - "dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=\"../.coverlet/\""
+    - "dotnet sonarscanner end /d:sonar.login=\"$SONAR_TOKEN\""
+  allow_failure: true
+
 tests:
   stage: test
   script:
