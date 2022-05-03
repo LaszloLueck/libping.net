@@ -26,6 +26,14 @@
 		<PackageSampleFile>SAMPLES.md</PackageSampleFile>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <Optimize></Optimize>
+      <Optimize>false</Optimize>
+      <LangVersion>latestmajor</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <LangVersion>latestmajor</LangVersion>
+    </PropertyGroup>
     <ItemGroup>
         <None Include="../LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
 		<None Include="../README.md" Pack="true" PackagePath="README.md" />

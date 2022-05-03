@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPing.Net", "LibPing.Net\LibPing.Net.csproj", "{F93C999F-AA5A-4D1D-8C17-B9A82CF27143}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibPing.Net.Test", "LibPing.Net.Test\LibPing.Net.Test.csproj", "{4C77B37C-29AA-4BD2-96CD-095C07036203}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{F93C999F-AA5A-4D1D-8C17-B9A82CF27143}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F93C999F-AA5A-4D1D-8C17-B9A82CF27143}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F93C999F-AA5A-4D1D-8C17-B9A82CF27143}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C77B37C-29AA-4BD2-96CD-095C07036203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C77B37C-29AA-4BD2-96CD-095C07036203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C77B37C-29AA-4BD2-96CD-095C07036203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C77B37C-29AA-4BD2-96CD-095C07036203}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
