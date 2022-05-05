@@ -25,9 +25,9 @@ public class Either<TL, TR>
             throw new ArgumentNullException(nameof(leftAction));
         }
 
-        if (leftAction == null)
+        if (rightAction == null)
         {
-            throw new ArgumentNullException(nameof(leftAction));
+            throw new ArgumentNullException(nameof(rightAction));
         }
 
         if (_isLeft)
