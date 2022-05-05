@@ -27,7 +27,4 @@ internal static class FunctionalExtensions
             _ => "IPAddressFamily not supported!"
         };
     };
-
-    internal static async Task<IEnumerable<T>> ResolveTasks<T>(this IEnumerable<Task<T>> tasks) =>
-        await Task.WhenAll(tasks);
 }
