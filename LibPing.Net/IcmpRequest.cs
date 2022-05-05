@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 
 namespace LibPing.Net;
 
@@ -81,7 +82,9 @@ internal class IcmpRequest
     private static readonly Func<int, byte[]> GenerateRandomData = length =>
     {
         var data = new byte[length];
-        new Random().NextBytes(data);
+        RandomNumberGenerator
+            .Create()
+            .GetBytes(data);
         return data;
     };
 
