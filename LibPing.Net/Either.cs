@@ -1,24 +1,43 @@
 ﻿namespace LibPing.Net;
 
-public class Either<TL, TR>
+/// <summary>
+/// Either class for handling right and left cases
+/// </summary>
+/// <typeparam name="TLeft"></typeparam>
+/// <typeparam name="TRight"></typeparam>
+public class Either<TLeft, TRight>
 {
-    private readonly TL _left;
-    private readonly TR _right;
+    private readonly TLeft? _left;
+    private readonly TRight? _right;
     private readonly bool _isLeft;
 
-    public Either(TL left)
+    /// <summary>
+    /// Either parameter declaration for Left
+    /// </summary>
+    /// <param name="left"></param>
+    private Either(TLeft left)
     {
         _left = left;
         _isLeft = true;
     }
 
-    public Either(TR right)
+    /// <summary>
+    /// Either parameter declartion for Right
+    /// </summary>
+    /// <param name="right"></param>
+    private Either(TRight right)
     {
         _right = right;
         _isLeft = false;
     }
 
-    public void Match(Action<TL> leftAction, Action<TR> rightAction)
+    /// <summary>
+    /// Matches about right or left case and invoke the appropriate action
+    /// </summary>
+    /// <param name="leftAction"></param>
+    /// <param name="rightAction"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public void Match(Action<TLeft> leftAction, Action<TRight> rightAction)
     {
         if (leftAction == null)
         {
@@ -32,15 +51,25 @@ public class Either<TL, TR>
 
         if (_isLeft)
         {
+            if (_left is null) throw new ArgumentNullException(nameof(_left));
             leftAction(_left);
         }
         else
         {
+            if (_right is null) throw new ArgumentNullException(nameof(_right));
             rightAction(_right);
         }
     }
 
-    public T Match<T>(Func<TL, T> leftFunc, Func<TR, T> rightFunc)
+    /// <summary>
+    /// Matches about right or left case, invoke the appropriate function, and return their result
+    /// </summary>
+    /// <param name="leftFunc"></param>
+    /// <param name="rightFunc"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    private T Match<T>(Func<TLeft, T> leftFunc, Func<TRight, T> rightFunc)
     {
         if (leftFunc == null)
         {
@@ -52,31 +81,56 @@ public class Either<TL, TR>
             throw new ArgumentNullException(nameof(rightFunc));
         }
 
-        return _isLeft ? leftFunc(_left) : rightFunc(_right);
+        return _isLeft switch
+        {
+            true when _left is null => throw new ArgumentNullException(nameof(_left)),
+            false when _right is null => throw new ArgumentNullException(nameof(_right)),
+            _ => _isLeft ? leftFunc.Invoke(_left!) : rightFunc.Invoke(_right!)
+        };
     }
 
     /// <summary>
     /// If right value is assigned, execute an action on it.
     /// </summary>
     /// <param name="rightAction">Action to execute.</param>
-    public void DoRight(Action<TR> rightAction)
+    public void DoRight(Action<TRight> rightAction)
     {
         if (rightAction == null)
         {
             throw new ArgumentNullException(nameof(rightAction));
         }
 
+        if (_right is null) throw new ArgumentNullException(nameof(_right));
+
         if (!_isLeft)
-        {                
+        {
             rightAction(_right);
         }
     }
 
-    public TL LeftOrDefault() => Match(l => l, r => default(TL));
+    /// <summary>
+    /// returns left value or, if not the case, the default.
+    /// </summary>
+    /// <returns></returns>
+    public TLeft? LeftOrDefault() => Match(l => l, r => default(TLeft));
 
-    public TR RightOrDefault() => Match(l => default(TR), r => r);
+    /// <summary>
+    /// returns right value, or if not the case, the default
+    /// </summary>
+    /// <returns></returns>
+    public TRight? RightOrDefault() => Match(l => default(TRight), r => r);
 
-    public static implicit operator Either<TL, TR>(TL left) => new(left);
+    /// <summary>
+    /// Either operator for the left case
+    /// </summary>
+    /// <param name="left"></param>
+    /// <returns></returns>
+    public static implicit operator Either<TLeft, TRight>(TLeft left) => new(left);
 
-    public static implicit operator Either<TL, TR>(TR right) => new(right);
+    /// <summary>
+    /// Either operator for the right case
+    /// </summary>
+    /// <param name="right"></param>
+    /// <returns></returns>
+    public static implicit operator Either<TLeft, TRight>(TRight right) => new(right);
 }

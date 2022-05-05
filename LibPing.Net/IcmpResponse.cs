@@ -3,6 +3,9 @@ using System.Net;
 
 namespace LibPing.Net;
 
+/// <summary>
+/// 
+/// </summary>
 public class IcmpResponse
 {
     /// <summary>
@@ -18,7 +21,7 @@ public class IcmpResponse
     /// <summary>
     /// the response type as readable string
     /// </summary>
-    public string TypeString;
+    public string? TypeString;
 
     /// <summary>
     /// the return type in as byte value. Attention! IPv4 and IPv6 uses different return values
@@ -28,7 +31,7 @@ public class IcmpResponse
     /// <summary>
     /// if the ttl is too slow for the amount of hops to the endpoint, the hop on the ttl position answered here. 
     /// </summary>
-    public IPEndPoint Origin;
+    public IPEndPoint? Origin;
 
     /// <summary>
     /// the local ip from which the ping is send
@@ -71,6 +74,9 @@ public class IcmpResponseV4 : IcmpResponse
     /// </summary>
     public readonly int Identifier;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public readonly MessageTypeV4 TypeEnum;
 
     /// <summary>
@@ -105,6 +111,9 @@ public class IcmpResponseV4 : IcmpResponse
 /// </summary>
 public class IcmpResponseV6 : IcmpResponse
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public MessageTypeV6 TypeEnum;
     
     internal IcmpResponseV6(IPEndPoint origin, int payloadSize, byte[] data, IPEndPoint? fromIp,

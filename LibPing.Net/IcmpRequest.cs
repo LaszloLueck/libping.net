@@ -16,10 +16,11 @@ internal class IcmpRequest
     public int ReceiveTimeout { get; private set; }
     public bool DontFragment { get; private set; }
     public IpAddressFamily AddressFamily { get; private set; }
-    public IPEndPoint IpEndPointFrom { get; private set; } = null!;
-    public IPEndPoint IpEndPointTo { get; private set; } = null!;
+    public IPEndPoint? IpEndPointFrom { get; private set; }
+    public IPEndPoint? IpEndPointTo { get; private set; }
 
-    internal async Task Init(int ttl, string endPoint, int receiveTimeout, bool dontFragment, CancellationToken cancellationToken)
+    internal async Task Init(int ttl, string endPoint, int receiveTimeout, bool dontFragment,
+        CancellationToken cancellationToken)
     {
         IpEndPointTo = await GetEndpointFromString(endPoint, cancellationToken);
         IpEndPointFrom = new IPEndPoint(await GetFromHostOrIp(AddressFamily, cancellationToken), 0);
@@ -37,8 +38,8 @@ internal class IcmpRequest
         Ttl = ttl;
         ReceiveTimeout = receiveTimeout;
         Code = 0x00;
-        Buffer.BlockCopy(BitConverter.GetBytes((short)1), 0, Payload, 0, 2);
-        Buffer.BlockCopy(BitConverter.GetBytes((short)1), 0, Payload, 2, 2);
+        Buffer.BlockCopy(BitConverter.GetBytes((short) 1), 0, Payload, 0, 2);
+        Buffer.BlockCopy(BitConverter.GetBytes((short) 1), 0, Payload, 2, 2);
         var data = GenerateRandomData(32);
         Buffer.BlockCopy(data, 0, Payload, 4, data.Length);
         MessageSize = data.Length + 4;
@@ -70,15 +71,13 @@ internal class IcmpRequest
             IpAddressFamily.IpV6 => 0x80,
             _ => throw new InvalidEnumArgumentException()
         };
-#pragma warning disable
+
     private static readonly Func<string, CancellationToken, Task<IPEndPoint>> GetEndpointFromString =
         async (endpointAsString, cancellationToken) => !IPAddress.TryParse(endpointAsString, out var ipAddress)
             ? await ResolveIpEndPoint(endpointAsString, cancellationToken)
-            : ipAddress is not null
-                ? new IPEndPoint(ipAddress, 0)
-                : throw new ArgumentNullException(nameof(ipAddress));
-#pragma warning restore
-    
+            : new IPEndPoint(ipAddress, 0);
+
+
     private static readonly Func<int, byte[]> GenerateRandomData = length =>
     {
         var data = new byte[length];
@@ -88,17 +87,16 @@ internal class IcmpRequest
         return data;
     };
 
-    private static readonly Func<string, CancellationToken, Task<IPEndPoint>> ResolveIpEndPoint =
-        async (stringIpOrHost, cancellationToken) =>
-        {
-            var hostIpAddresses = await Dns.GetHostAddressesAsync(stringIpOrHost, cancellationToken);
-            if (hostIpAddresses.Length is 0)
-                throw new InvalidOperationException(nameof(hostIpAddresses));
-            var hostAddress = hostIpAddresses.FirstOrDefault();
-            return (hostAddress is not null) 
-                ? new IPEndPoint(hostAddress, 0) 
-                : throw new ArgumentNullException(nameof(hostAddress));
-        };
+    private static async Task<IPEndPoint> ResolveIpEndPoint(string stringIpOrHost, CancellationToken cancellationToken)
+    {
+        var hostIpAddresses = await Dns.GetHostAddressesAsync(stringIpOrHost, cancellationToken);
+        if (hostIpAddresses.Length is 0)
+            throw new InvalidOperationException(nameof(hostIpAddresses));
+        var hostAddress = hostIpAddresses.FirstOrDefault();
+        return hostAddress is not null
+            ? new IPEndPoint(hostAddress, 0)
+            : throw new ArgumentNullException(nameof(hostAddress));
+    }
 
     private byte[] GetBytes()
     {
@@ -120,6 +118,6 @@ internal class IcmpRequest
             .Sum(value => Convert.ToUInt32(BitConverter.ToUInt16(bytes, value)));
         checkSum = (checkSum >> 16) + (checkSum & 0xffff);
         checkSum += checkSum >> 16;
-        return (ushort)~checkSum;
+        return (ushort) ~checkSum;
     };
 }

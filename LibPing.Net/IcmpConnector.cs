@@ -36,6 +36,9 @@ public static class IcmpConnector
             default:
                 throw new InvalidEnumArgumentException();
         }
+
+        if (icmpRequest.IpEndPointTo is null) throw new ArgumentNullException(nameof(icmpRequest.IpEndPointTo));
+        if (icmpRequest.IpEndPointFrom is null) throw new ArgumentNullException(nameof(icmpRequest.IpEndPointFrom));
         
         host.ReceiveTimeout = icmpRequest.ReceiveTimeout;
 
