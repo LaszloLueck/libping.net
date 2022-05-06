@@ -23,6 +23,7 @@ internal class IcmpRequest
         CancellationToken cancellationToken)
     {
         IpEndPointTo = await GetEndpointFromString(endPoint, cancellationToken);
+        AddressFamily = GetIpAddressFamily(IpEndPointTo.AddressFamily);
         IpEndPointFrom = new IPEndPoint(await GetFromHostOrIp(AddressFamily, cancellationToken), 0);
 
         if (IpEndPointTo is null)
@@ -31,7 +32,6 @@ internal class IcmpRequest
         if (IpEndPointFrom is null)
             throw new ArgumentNullException(nameof(IpEndPointFrom));
 
-        AddressFamily = GetIpAddressFamily(IpEndPointTo.AddressFamily);
         Type = CalculateType(AddressFamily);
 
         DontFragment = dontFragment;
@@ -57,11 +57,14 @@ internal class IcmpRequest
     private static readonly Func<IpAddressFamily, CancellationToken, Task<IPAddress>> GetFromHostOrIp =
         async (addressFamily, cancellationToken) =>
         {
-            return addressFamily == IpAddressFamily.IpV4
-                ? (await Dns.GetHostEntryAsync(Dns.GetHostName(), cancellationToken)).AddressList.First(i =>
-                    i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                : (await Dns.GetHostEntryAsync(Dns.GetHostName(), cancellationToken)).AddressList.First(i =>
-                    i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6);
+            var al = (await Dns.GetHostEntryAsync(Dns.GetHostName(), cancellationToken)).AddressList;
+            return addressFamily switch
+            {
+                IpAddressFamily.IpV4 => al.First(i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork),
+                IpAddressFamily.IpV6 => al.First(
+                    i => i.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6),
+                _ => throw new ArgumentOutOfRangeException(nameof(addressFamily), addressFamily, "Unresolvable parameter given")
+            };
         };
 
     private static readonly Func<IpAddressFamily, byte> CalculateType = addressFamily =>

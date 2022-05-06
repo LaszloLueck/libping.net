@@ -22,7 +22,7 @@ public static class IcmpConnector
             IpAddressFamily.IpV6 => new Socket(AddressFamily.InterNetworkV6, SocketType.Raw, ProtocolType.IcmpV6),
             _ => throw new InvalidEnumArgumentException()
         };
-
+        
         switch (icmpRequest.AddressFamily)
         {
             case IpAddressFamily.IpV4:
@@ -32,6 +32,7 @@ public static class IcmpConnector
                 break;
             case IpAddressFamily.IpV6:
                 host.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IpTimeToLive, icmpRequest.Ttl);
+                host.DualMode = false;
                 break;
             default:
                 throw new InvalidEnumArgumentException();
@@ -49,6 +50,7 @@ public static class IcmpConnector
 
         var sw = Stopwatch.StartNew();
         await host.SendToAsync(sendPayload, SocketFlags.None, icmpRequest.IpEndPointTo, cancellationToken);
+       
         var received =
             await host.ReceiveFromAsync(returnedPayload, SocketFlags.None, icmpRequest.IpEndPointFrom,
                 cancellationToken);

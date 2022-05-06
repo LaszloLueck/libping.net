@@ -100,10 +100,10 @@ public class Either<TLeft, TRight>
             throw new ArgumentNullException(nameof(rightAction));
         }
 
-        if (_right is null) throw new ArgumentNullException(nameof(_right));
 
         if (!_isLeft)
         {
+            if (_right is null) throw new ArgumentNullException(nameof(_right));
             rightAction(_right);
         }
     }
