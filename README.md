@@ -4,6 +4,20 @@ Regards and thanks for usage.
 
 If you only know about how you can build ping or traceroute things, please visit the <a href="SAMPLES.md">samples</a> file, where you can find examples for those routines.
 
+## Which configuration works?
+The following list shows some configurations with which the library was tested.
+
+| System                    | Current state | Description  | Tested with version |
+|---------------------------|---------------|--------------|---------------------|
+| Microsoft Windows (x64)   | working       |              | 0.1.18              |
+| Microsoft Windows (arm64) | not tested    |              |                     |
+| Linux (x64)               | working       | ubuntu       | 0.1.18              |
+| Linux (arm64)             | not tested    |              |                     |
+| MacOSx (x64)              | not tested    |              |                     |
+| MacOSx (arm64)            | working       |              | 0.1.18              |
+| Docker (x64)              | working       | ubuntu image | 0.1.18              |
+| Docker (arm64)            | not tested    |              |                     |
+
 ## Installation
 As easy as is, use nuget to include the lib (dll) to your project and use it.
 
