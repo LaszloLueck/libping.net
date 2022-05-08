@@ -32,7 +32,8 @@ public static class IcmpConnector
                 break;
             case IpAddressFamily.IpV6:
                 host.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IpTimeToLive, icmpRequest.Ttl);
-                host.DualMode = false;
+                if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) 
+                    host.DualMode = false;
                 break;
             default:
                 throw new InvalidEnumArgumentException();
