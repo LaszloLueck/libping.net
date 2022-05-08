@@ -11,7 +11,7 @@ The following list shows some configurations with which the library was tested.
 |---------------------------|---------------|--------------|---------------------|
 | Microsoft Windows (x64)   | working       |              | 0.1.18              |
 | Microsoft Windows (arm64) | not tested    |              |                     |
-| Linux (x64)               | working       | ubuntu       | 0.1.18              |
+| Linux (x64)               | working       | ubuntu       | 0.1.19              |
 | Linux (arm64)             | not tested    |              |                     |
 | MacOSx (x64)              | not tested    |              |                     |
 | MacOSx (arm64)            | working       |              | 0.1.18              |
