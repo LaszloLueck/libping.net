@@ -7,18 +7,18 @@ If you only know about how you can build ping or traceroute things, please visit
 ## Which configuration works?
 The following list shows some configurations with which the library was tested.
 
-| System                        | Current state | Description  | Tested with version | Comment                                              |
-|-------------------------------|---------------|--------------|---------------------|------------------------------------------------------|
-| Microsoft Windows (x64)       | working       |              | 0.1.18              | Windows 10 / 11                                      |
-| Microsoft Windows (arm64)     | not tested    |              |                     |                                                      |
-| Microsoft Windows (x64) WSL   | working       |              | 0.1.19              | WSL 2                                                |
-| Microsoft Windows (arm64) WSL | not tested    |              |                     |                                                      |
-| Linux (x64)                   | working       | ubuntu       | 0.1.18              |                                                      |
-| Linux (arm64)                 | partially     | ubuntu       |                     | VM under MacOS / Traceroute doesn't work as expected |
-| MacOSx (x64)                  | not tested    |              | 0.1.18              |                                                      |
-| MacOSx (arm64)                | working       |              | 0.1.18              | fixed with 0.1.18                                    |
-| Docker (x64)                  | working       | ubuntu image | 0.1.18              |                                                      |
-| Docker (arm64)                | not tested    |              |                     |                                                      |
+| System                        | Current state | Description  | Tested with version | Comment                                                                                                            |
+|-------------------------------|---------------|--------------|---------------------|--------------------------------------------------------------------------------------------------------------------|
+| Microsoft Windows (x64)       | working       |              | 0.1.18              | Windows 10 / 11                                                                                                    |
+| Microsoft Windows (arm64)     | partially     |              |                     | VM under MacOS / Traceroute doesn't work as expected; Ping works fine. Seems to be a problem with async enumerable? |
+| Microsoft Windows (x64) WSL   | working       |              | 0.1.19              | WSL 2                                                                                                              |
+| Microsoft Windows (arm64) WSL | not tested    |              |                     |                                                                                                                    |
+| Linux (x64)                   | working       | ubuntu       | 0.1.18              |                                                                                                                    |
+| Linux (arm64)                 | partially     | ubuntu       |                     | VM under MacOS / Traceroute doesn't work as expected Ping works fine. Seems to be a problem with async enumerable? |
+| MacOSx (x64)                  | not tested    |              | 0.1.18              |                                                                                                                    |
+| MacOSx (arm64)                | working       |              | 0.1.18              | fixed with 0.1.18                                                                                                  |
+| Docker (x64)                  | working       | ubuntu image | 0.1.18              |                                                                                                                    |
+| Docker (arm64)                | not tested    |              |                     |                                                                                                                    |
 
 ## Installation
 As easy as is, use nuget to include the lib (dll) to your project and use it.
