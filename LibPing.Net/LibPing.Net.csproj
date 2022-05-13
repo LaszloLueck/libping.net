@@ -5,14 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.1.19</PackageVersion>
+        <PackageVersion>0.1.20</PackageVersion>
         <Title>LibPing.Net</Title>
         <Authors>Laszlo.Lueck</Authors>
         <Description>This class implements the ping functionality of the Icmp standard RFC-792. The library is completely written with low level sockets in C#. To use it you have to be administrator / root due to operating system restrictions. But the library works correctly under Windows / Linux / MacOS. The DotnetCore standard ping library uses the operating system methods for ping and passes the results up, which is very clumsy.</Description>
         <Copyright>Laszlo Lueck</Copyright>
         <PackageProjectUrl>https://github.com/LaszloLueck/libping.net</PackageProjectUrl>
         <RepositoryUrl>https://github.com/LaszloLueck/libping.net</RepositoryUrl>
-        <PackageReleaseNotes>fix issue in dualmode-property</PackageReleaseNotes>
+        <PackageReleaseNotes>update readme as describes a behavior on macos with vm and guest os.</PackageReleaseNotes>
         <PackageId>LibPing.Net</PackageId>
         <PackageLicenseUrl></PackageLicenseUrl>
 		

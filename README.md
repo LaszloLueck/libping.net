@@ -10,19 +10,19 @@ The following list shows some configurations with which the library was tested.
 | System                        | Current state | Description   | Tested with version | Comment                                                                                                                      |
 |-------------------------------|---------------|---------------|---------------------|------------------------------------------------------------------------------------------------------------------------------|
 | Microsoft Windows (x64)       | working       |               | 0.1.18              | Windows 10 / 11                                                                                                              |
-| Microsoft Windows (arm64)     | partially *1) |               | 0.1.19              | VM under MacOS / Traceroute doesn't work as expected; Ping works fine. Seems to be a problem with the Virtualization Engine? |
+| Microsoft Windows (arm64)     | working *1)   |               | 0.1.19              | VM under MacOS / Traceroute doesn't work as expected; Ping works fine. Seems to be a problem with the Virtualization Engine? |
 | Microsoft Windows (x64) WSL   | working       |               | 0.1.19              | WSL 2                                                                                                                        |
 | Microsoft Windows (arm64) WSL | not tested    |               |                     |                                                                                                                              |
 | Linux (x64)                   | working       | ubuntu        | 0.1.18              |                                                                                                                              |
-| Linux (arm64)                 | partially *1) | ubuntu        | 0.1.19              | VM under MacOS / Traceroute doesn't work as expected Ping works fine. Seems to be a problem with the Virtualization Engine?  |
-| Linux (arm64)                 | not tested    | ubuntu server |                     | native on a raspberry pi                                                                                                     |
+| Linux (arm64)                 | working *1)   | ubuntu        | 0.1.19              | VM under MacOS / Traceroute doesn't work as expected Ping works fine. Seems to be a problem with the Virtualization Engine?  |
+| Linux (arm64)                 | working       | ubuntu server | 0.1.19              | native on a raspberry pi                                                                                                     |
 | MacOSx (x64)                  | not tested    |               | 0.1.18              |                                                                                                                              |
 | MacOSx (arm64)                | working       |               | 0.1.18              | fixed with 0.1.18                                                                                                            |
 | Docker (x64)                  | working       | ubuntu image  | 0.1.18              |                                                                                                                              |
 | Docker (arm64)                | not tested    |               |                     |                                                                                                                              |
 
+#### What does *1) mean?
 
-1) What does partially mean?
 For testing purposes on arm64, i setup the following configuration:
 - Host MacBook Pro 2021 on Arm Chip
 - VM-Virtualisation Parallels Desktop 17
@@ -81,6 +81,50 @@ Same behavior with the os built in traceroute commands.
 I will extend the traceroute on arm64 native on a raspberry pi soon to check it out under real circumstances.
 
 I believe it is no a behavior with the OS (it would be very strange if windows and linux struggle with the same prob at the same time), i think it is a prob with the virtualization engine or the virtual network or what ever.
+
+### Update 2022-05-13
+As expected, with an Raspberry Pi 4 / 4 GB RAM and the following configuration:
+```shell
+/home/ubuntu/dotnet/dotnet --info
+.NET SDK (reflecting any global.json):
+ Version:   6.0.300
+ Commit:    8473146e7d
+
+Runtime Environment:
+ OS Name:     ubuntu
+ OS Version:  20.04
+ OS Platform: Linux
+ RID:         ubuntu.20.04-arm64
+ Base Path:   /home/ubuntu/dotnet/sdk/6.0.300/
+
+Host (useful for support):
+  Version: 6.0.5
+  Commit:  70ae3df4a6
+
+.NET SDKs installed:
+  6.0.300 [/home/ubuntu/dotnet/sdk]
+
+.NET runtimes installed:
+  Microsoft.AspNetCore.App 6.0.5 [/home/ubuntu/dotnet/shared/Microsoft.AspNetCore.App]
+  Microsoft.NETCore.App 6.0.5 [/home/ubuntu/dotnet/shared/Microsoft.NETCore.App]
+```
+the Traceroute works like a charme as expected.
+```shell
+Do a Traceroute to 1.1.1.1
+------------------------------
+1 : 192.168.0.1 : 0 ms : TimeExceeded
+2 : 195.14.226.125 : 5 ms : TimeExceeded
+3 : 89.1.16.161 : 5 ms : TimeExceeded
+4 : 89.1.86.45 : 5 ms : TimeExceeded
+5 : 81.173.192.6 : 5 ms : TimeExceeded
+6 : 194.146.118.139 : 6 ms : TimeExceeded
+7 : 1.1.1.1 : 6 ms : EchoReply
+------------------------------
+Finished Traceroute
+```
+The behavior is like on virtual machines (especially Parallels Desktop 17?).
+
+As native running app on Arm64 machines it works. 
 
 ## Installation
 As easy as is, use nuget to include the lib (dll) to your project and use it.
