@@ -69,7 +69,7 @@ public class Either<TLeft, TRight>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    private T Match<T>(Func<TLeft, T> leftFunc, Func<TRight, T> rightFunc)
+    public T Match<T>(Func<TLeft, T> leftFunc, Func<TRight, T> rightFunc)
     {
         if (leftFunc == null)
         {
