@@ -48,5 +48,26 @@ public static class Icmp
         await request.Init(ttl, ipOrHostName, receiveTimeout, dontFragment, cancellationToken);
         return await IcmpConnector.Ping(request, cancellationToken);
     }
-    
+
+    /// <summary>
+    /// process an ICMP echo (RFC-792) command, also called ping in an async and safe manner. If an exception was thrown, the return is an left either result with the exception and the host to ping, if there is no error, the right result returns 
+    /// </summary>
+    /// <param name="ipOrHostName">the IP-address or the Hostname to ping to. If you pass an IPv4 address, IPv4 echo is also used. If you pass an IPv6 address, then according to IPv6 rules. If you enter a hostname, it will be checked if the hostname could be resolved as an IPv6 address, if not, IPv4 will be used. </param>
+    /// <param name="ttl">The meaning of ttl (time to live) is not so much a time but how many hops (endpoints) may be spent on the ping. E.g. the endpoint to be pinged is 8 hops away. If you enter a 3 as ttl, a result is returned from the 3rd hop in the query series with a ResultType for IPv4 = 11 / IPv6 = 3 (means Time exceeded). ttl is especially useful for traceroute queries. </param>
+    /// <param name="receiveTimeout">time in milliseconds. After this time, the connection would be unsuccessful closed with an exception.</param>
+    /// <param name="cancellationToken">cancellation token for async requests we made.</param>
+    /// <returns>returns the either result, left if an exception was thrown and right with the icmp return</returns>
+    public static async Task<Either<IcmpLeftResult, IcmpResponse>> PingSecure(string ipOrHostName, int ttl,
+        int receiveTimeout, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await Ping(ipOrHostName, ttl, receiveTimeout, cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return new IcmpLeftResult(e, ipOrHostName);
+        }
+    }
+
 }
