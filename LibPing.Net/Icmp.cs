@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using LanguageExt;
 
 namespace LibPing.Net;
 

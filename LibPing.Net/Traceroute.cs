@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Runtime.CompilerServices;
+using LanguageExt;
 
 namespace LibPing.Net;
 
@@ -23,11 +24,10 @@ public static class Traceroute
         while (hop <= maxHops && tp is not 0 and not 129)
         {
             var tR = await GetTracerouteResponse(ipAddressOrHost, receiveTimeout, hop);
-            tR.DoRight(r => tp = r.Type);
+            tR.IfRight(r => tp = r.Type);
             hop++;
             yield return tR;
         }
-
     }
 
     private static async Task<Either<TracerouteLeftResult, TracerouteResponse>> GetTracerouteResponse(string ipOrAddress, int receiveTimeout, int hop)
