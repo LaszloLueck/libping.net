@@ -10,4 +10,5 @@ namespace LibPing.Net;
 /// <param name="Origin"></param>
 /// <param name="State"></param>
 /// <param name="Type"></param>
-public record TracerouteResponse(int Hop, long RoundTripTime, IPEndPoint? Origin, string? State, int Type);
+/// <param name="AddressFamily"></param>
+public record TracerouteResponse(int Hop, long RoundTripTime, IPEndPoint? Origin, string? State, int Type, IpAddressFamily AddressFamily);

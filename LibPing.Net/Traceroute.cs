@@ -37,7 +37,7 @@ public static class Traceroute
         try
         {
             var bt = await Icmp.Ping(ipOrAddress, hop, receiveTimeout, token);
-            return new TracerouteResponse(hop, bt.RoundTripTime, bt.Origin, bt.TypeString, bt.Type);
+            return new TracerouteResponse(hop, bt.RoundTripTime, bt.Origin, bt.TypeString, bt.Type, bt.AddressFamily);
         }
         catch (Exception exception)
         {
