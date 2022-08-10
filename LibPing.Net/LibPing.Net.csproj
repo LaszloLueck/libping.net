@@ -40,7 +40,7 @@
 		<None Include="../SAMPLES.md" Pack="true" PackagePath="SAMPLES.md" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="LanguageExt.Core" Version="4.1.1" />
+      <PackageReference Include="LanguageExt.Core" Version="4.2.9" />
     </ItemGroup>
 
 </Project>
